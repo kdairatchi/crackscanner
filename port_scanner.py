@@ -1,28 +1,23 @@
-import exploit_repository
 import socket
 from concurrent.futures import ThreadPoolExecutor
 import argparse
-from exploit_repository import EXPLOIT_REPOSITORY  # Import the exploit repository
+from exploit_repository import EXPLOIT_REPOSITORY
 
 def prompt_for_db_connection():
-    """Prompt the user for connecting to a vulnerability database."""
     choice = input("Do you want to connect to a vulnerability database (NVD/Exploit-DB)? (yes/no): ").strip().lower()
     if choice == 'yes':
         print("To connect to a vulnerability database, you may need to create an account.")
         print("1. **NVD**: Visit https://nvd.nist.gov/ to create an account.")
         print("2. **Exploit-DB**: Visit https://www.exploit-db.com/ to create an account.")
-        print("\nAfter creating an account, you will need an API key or credentials to access the API.")
         api_key = input("Enter your API key (or leave blank if not using): ").strip()
         return api_key
     else:
-        print("Continuing without a database connection.")
         return None
 
 def scan_port(host, port, verbose):
-    """Scan a single port on the host."""
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            sock.settimeout(1)  # Set timeout for socket connection
+            sock.settimeout(1)
             result = sock.connect_ex((host, port))
             if result == 0:
                 if verbose:
@@ -38,7 +33,6 @@ def scan_port(host, port, verbose):
         return None
 
 def detect_os(open_ports):
-    """Detect OS based on open ports (basic heuristic)."""
     if 22 in open_ports:
         return "Linux (SSH)"
     elif 80 in open_ports or 443 in open_ports:
@@ -52,7 +46,6 @@ def detect_os(open_ports):
     return "Unknown OS"
 
 def check_vulnerabilities(open_ports):
-    """Check for vulnerabilities based on open ports using the exploit repository."""
     vulnerabilities_found = {}
     for port in open_ports:
         if port in EXPLOIT_REPOSITORY:
@@ -60,7 +53,6 @@ def check_vulnerabilities(open_ports):
     return vulnerabilities_found
 
 def scan_ports(host, start_port, end_port, verbose):
-    """Scan a range of ports on the host."""
     open_ports = []
     with ThreadPoolExecutor(max_workers=100) as executor:
         futures = {executor.submit(scan_port, host, port, verbose): port for port in range(start_port, end_port + 1)}
@@ -68,16 +60,13 @@ def scan_ports(host, start_port, end_port, verbose):
             result = future.result()
             if result is not None:
                 open_ports.append(result)
-
     return open_ports
 
 def display_results(open_ports, api_key=None):
-    """Display the scan results and potential vulnerabilities."""
     if open_ports:
         os_detected = detect_os(open_ports)
         print(f"\n[+] Open ports: {open_ports}")
         print(f"[+] Detected OS: {os_detected}")
-
         vulnerabilities = check_vulnerabilities(open_ports)
         if vulnerabilities:
             print("[+] Potential vulnerabilities found:")
@@ -92,13 +81,11 @@ def display_results(open_ports, api_key=None):
         print("\n[-] No open ports found.")
 
 def main_menu():
-    """Display the main menu for user interaction."""
     print("\n[1] Rescan ports")
     print("[2] Save results to file")
     print("[3] Exit")
 
 def save_results(open_ports, os_detected):
-    """Save the scan results to a file."""
     with open("scan_results.txt", "w") as f:
         f.write(f"Open ports: {open_ports}\n")
         f.write(f"Detected OS: {os_detected}\n")
@@ -110,26 +97,22 @@ if __name__ == "__main__":
     parser.add_argument('start_port', type=int, help='Starting port number (e.g., 1)')
     parser.add_argument('end_port', type=int, help='Ending port number (e.g., 1024)')
     parser.add_argument('-v', '--verbose', action='store_true', help='Enable verbose output')
-    
+
     args = parser.parse_args()
 
-    # Prompt for database connection
     api_key = prompt_for_db_connection()
-    
+
     print(f"Scanning {args.host} from port {args.start_port} to {args.end_port}...")
     open_ports = scan_ports(args.host, args.start_port, args.end_port, args.verbose)
-    
+
     display_results(open_ports, api_key)
 
     if open_ports:
         os_detected = detect_os(open_ports)
-        
         while True:
             main_menu()
             choice = input("Select an option: ")
-            
             if choice == '1':
-                print(f"Rescanning {args.host} from port {args.start_port} to {args.end_port}...")
                 open_ports = scan_ports(args.host, args.start_port, args.end_port, args.verbose)
                 display_results(open_ports, api_key)
             elif choice == '2':
