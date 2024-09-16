@@ -54,7 +54,7 @@ This will scan the host `192.168.1.1` from port 1 to port 1024 and display the r
 
 Note: Make sure to replace the `https://api.example.com/v1/check` and `https://api.example.com/v1/exploits` URLs in the `main.py` file with the actual URLs of the API you are using.
 
-
+**Original**
 **File Structure:**
 
  
