@@ -92,6 +92,12 @@ def save_results(open_ports, os_detected):
         print("[+] Results saved to scan_results.txt")
 
 if __name__ == "__main__":
+    import sys
+
+    if len(sys.argv) < 4:
+        print("Usage: port_scanner.py <host> <start_port> <end_port> [-v]")
+        sys.exit(1)
+
     parser = argparse.ArgumentParser(description='Enhanced Port Scanner with Vulnerability Detection')
     parser.add_argument('host', help='Host to scan (e.g., 192.168.1.1)')
     parser.add_argument('start_port', type=int, help='Starting port number (e.g., 1)')
@@ -122,4 +128,3 @@ if __name__ == "__main__":
                 break
             else:
                 print("Invalid option. Please try again.")
-                
