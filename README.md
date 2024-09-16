@@ -3,8 +3,26 @@ Nmap on crack using py
 Here is the complete project with all the necessary files and instructions on how to run it:
 
 **How to Run:**
+Virtual Environment (Optional but recommended): Create a virtual environment to manage dependencies and avoid conflicts with system-wide packages.
 
+    Install Python 3.10 (or later) from the official Python website.
+
+    python -m venv venv
+    source venv/bin/activate  # On Windows use: venv\Scripts\activate
+
+
+
+	Install Dependencies:
+
+    pip install -r requirements.txt
+
+
+    Ensure exploit_repository.py is in the same directory or correctly referenced.
+    Run the Script:
+
+    python port_scanner.py <host> <start_port> <end_port> [-v]
  
+ =================##########################======================================================
 
 1. Save the `exploit_repository.py`, `port_scanner.py`, and `main.py` files in the same directory.
 
